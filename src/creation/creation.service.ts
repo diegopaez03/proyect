@@ -12,22 +12,26 @@ export class CreationService {
     private creationRepository: Repository<Creation>,
   ) {}
 
-  async create(createCreationDto: CreateCreationDto) {
-    const creationFound = await this.creationRepository.findOne({
-      where: {
-        creationName: createCreationDto.creationName,
-      },
-    });
-
-    if (creationFound) {
-      throw new HttpException(
-        'Creation name already exists',
-        HttpStatus.CONFLICT,
-      );
+  async create(createCreationDtoArray: CreateCreationDto[]) {
+    const results = [];
+    for (const createCreationDto of createCreationDtoArray) {
+      const creationFound = await this.creationRepository.findOne({
+        where: {
+          creationName: createCreationDto.creationName,
+        },
+      });
+  
+      if (creationFound) {
+        throw new HttpException(
+          'Creation name already exists',
+          HttpStatus.CONFLICT,
+        );
+      }
+  
+      const newCreation = this.creationRepository.create(createCreationDto);
+      results.push(await this.creationRepository.save(newCreation));
     }
-
-    const newCreation = this.creationRepository.create(createCreationDto);
-    return this.creationRepository.save(newCreation);
+    return results;
   }
 
   findAll() {

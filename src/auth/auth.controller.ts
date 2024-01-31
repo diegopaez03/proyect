@@ -5,15 +5,18 @@ import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
 
-    constructor(private readonly authService: AuthService) {}
-
-    @Post("register")
-    register(@Body() registerDto: RegisterDto) {
+  @Post('register')
+  register(@Body() registerDto: RegisterDto | RegisterDto[]) {
+    if (Array.isArray(registerDto)) {
+      return this.authService.registerBatch(registerDto);
+    } else {
       return this.authService.register(registerDto);
     }
+  }
 
-    @Post("login")
+  @Post('login')
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }

@@ -8,8 +8,8 @@ export class CreationController {
   constructor(private readonly creationService: CreationService) {}
 
   @Post()
-  create(@Body() createCreationDto: CreateCreationDto) {
-    return this.creationService.create(createCreationDto);
+  create(@Body() createCreationDtoArray: CreateCreationDto[]) {
+    return this.creationService.create(createCreationDtoArray);
   }
 
   @Get()
