@@ -29,6 +29,6 @@ export class CreationController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.creationService.remove(+id);
+    return this.creationService.deleteCreation(+id);
   }
 }

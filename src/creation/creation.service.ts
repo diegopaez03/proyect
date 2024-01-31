@@ -1,26 +1,74 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCreationDto } from './dto/create-creation.dto';
 import { UpdateCreationDto } from './dto/update-creation.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Creation } from './entities/creation.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CreationService {
-  create(createCreationDto: CreateCreationDto) {
-    return 'This action adds a new creation';
+  constructor(
+    @InjectRepository(Creation)
+    private creationRepository: Repository<Creation>,
+  ) {}
+
+  async create(createCreationDto: CreateCreationDto) {
+    const creationFound = await this.creationRepository.findOne({
+      where: {
+        creationName: createCreationDto.creationName,
+      },
+    });
+
+    if (creationFound) {
+      throw new HttpException(
+        'Creation name already exists',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    const newCreation = this.creationRepository.create(createCreationDto);
+    return this.creationRepository.save(newCreation);
   }
 
   findAll() {
-    return `This action returns all creation`;
+    return this.creationRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} creation`;
+  async findOne(creationId: number) {
+    const creationFound = await this.creationRepository.findOne({
+      where: {
+        creationId,
+      },
+    });
+
+    if (!creationFound) {
+      return new HttpException('Creation not found', HttpStatus.NOT_FOUND);
+    }
+
+    return creationFound;
   }
 
-  update(id: number, updateCreationDto: UpdateCreationDto) {
-    return `This action updates a #${id} creation`;
+  async update(creationId: number, updateCreationDto: UpdateCreationDto) {
+    const creationFound = await this.creationRepository.findOne({
+      where: {
+        creationId
+      }
+    });
+
+    if (!creationFound) {
+      return new HttpException('Creation not found', HttpStatus.NOT_FOUND)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} creation`;
+  const updateCreation = Object.assign(creationFound, updateCreationDto);
+  return this.creationRepository.save(updateCreation);
+  }
+
+  async deleteCreation(creationId: number) {
+    const result = await this.creationRepository.softDelete(creationId);
+    if (result.affected === 0) {
+      return new HttpException('Creation not found', HttpStatus.NOT_FOUND);
+    }
+
+    return result;
   }
 }
