@@ -49,6 +49,7 @@ export class ScientistService {
                 username
             }
         });
+        
       return scientistFound
 
     }

@@ -12,9 +12,11 @@ export class CreationService {
     private creationRepository: Repository<Creation>,
   ) {}
 
-  async create(createCreationDtoArray: CreateCreationDto[]) {
+  async create(createCreationDtoOrArray: CreateCreationDto | CreateCreationDto[]) {
+    const createCreationDtos = Array.isArray(createCreationDtoOrArray) ? createCreationDtoOrArray : [createCreationDtoOrArray];
     const results = [];
-    for (const createCreationDto of createCreationDtoArray) {
+
+    for (const createCreationDto of createCreationDtos) {
       const creationFound = await this.creationRepository.findOne({
         where: {
           creationName: createCreationDto.creationName,
@@ -38,6 +40,15 @@ export class CreationService {
     return this.creationRepository.find();
   }
 
+  async getCreationsByUsername(username: string): Promise<Creation[]> {
+    const creationFound = this.creationRepository.find({ where: { scientist: { username } } })
+
+    if (!creationFound) {
+      throw new HttpException('Creation not found', HttpStatus.NOT_FOUND);
+    }
+    return creationFound;
+  }
+
   async findOne(creationId: number) {
     const creationFound = await this.creationRepository.findOne({
       where: {
@@ -45,9 +56,7 @@ export class CreationService {
       },
     });
 
-    if (!creationFound) {
-      return new HttpException('Creation not found', HttpStatus.NOT_FOUND);
-    }
+    
 
     return creationFound;
   }

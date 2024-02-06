@@ -5,6 +5,7 @@ import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -44,12 +45,14 @@ export class AuthService {
     };
   }
 
-  async login({ username, password }: LoginDto) {
-    const scientistFound =
-      await this.scientistService.findOneScientistByUsername(username);
+  async login(loginDto: LoginDto) {
+    const { username, password } = loginDto;
+    const logged = true;
+    const scientistFound = await this.scientistService.findOneScientistByUsername(username);
 
     if (!scientistFound) {
-      return new HttpException('Invalid username', HttpStatus.CONFLICT);
+      const logged = false;
+      return new HttpException('Invalid username or password', HttpStatus.CONFLICT);
     }
 
     const isPasswordValid = await bcryptjs.compare(
@@ -58,14 +61,17 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      return new HttpException('Invalid password', HttpStatus.CONFLICT);
+      const logged = false;
+      return new HttpException('Invalid username or password', HttpStatus.CONFLICT);
     }
+
 
     const payload = { scientistFound: scientistFound.username };
 
     const token = await this.jwtService.signAsync(payload);
 
     return {
+      loggedIn: logged,
       token: token,
       scientistFound: scientistFound.username,
     };

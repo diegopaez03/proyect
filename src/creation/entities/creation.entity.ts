@@ -4,7 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -31,7 +31,7 @@ export class Creation {
   @DeleteDateColumn({ name: 'endDate', nullable: true })
   endDate: Date;
 
-  @OneToOne(() => Scientist)
+  @ManyToOne(() => Scientist)
   @JoinColumn({ name: 'scientistId' })
   scientist: Scientist;
 }

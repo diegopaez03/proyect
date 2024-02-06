@@ -17,9 +17,9 @@ export class CreationController {
     return this.creationService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.creationService.findOne(+id);
+  @Get(':username')
+  getCreationsByUsername(@Param('username') username: string){
+    return this.creationService.getCreationsByUsername(username)
   }
 
   @Patch(':id')
