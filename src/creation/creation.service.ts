@@ -49,14 +49,28 @@ export class CreationService {
     return creationFound;
   }
 
+  async getCreationByUsernameAndId(username: string, creationId: number): Promise<Creation> {
+    const creation = await this.creationRepository.findOne({
+      where: {
+        scientist: { username },
+        creationId: creationId,
+      },
+    });
+
+    if (!creation) {
+      throw new HttpException('Creation not found', HttpStatus.NOT_FOUND);
+    }
+
+    return creation;
+  }
+
+
   async findOne(creationId: number) {
     const creationFound = await this.creationRepository.findOne({
       where: {
         creationId,
       },
     });
-
-    
 
     return creationFound;
   }

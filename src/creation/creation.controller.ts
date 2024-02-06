@@ -22,6 +22,14 @@ export class CreationController {
     return this.creationService.getCreationsByUsername(username)
   }
 
+  @Get(':username/:id')
+  getCreationByUsernameAndId(
+    @Param('username') username: string,
+    @Param('id') id: string
+  ) {
+    return this.creationService.getCreationByUsernameAndId(username, +id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCreationDto: UpdateCreationDto) {
     return this.creationService.update(+id, updateCreationDto);
