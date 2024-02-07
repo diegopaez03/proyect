@@ -26,9 +26,9 @@ export class ScientistController {
         return this.scientistService.deleteScientist(scientistId);
     }
 
-    @Get(':scientistId')
-    getScientist(@Param('scientistId', ParseIntPipe) scientistId: number) {
-        return this.scientistService.getScientist(scientistId);
+    @Get(':username')
+    getScientist(@Param('username') username: string) {
+        return this.scientistService.findOneScientistByUsername(username);
     }
 
     @Patch(':scientistId')

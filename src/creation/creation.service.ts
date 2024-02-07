@@ -12,8 +12,12 @@ export class CreationService {
     private creationRepository: Repository<Creation>,
   ) {}
 
-  async create(createCreationDtoOrArray: CreateCreationDto | CreateCreationDto[]) {
-    const createCreationDtos = Array.isArray(createCreationDtoOrArray) ? createCreationDtoOrArray : [createCreationDtoOrArray];
+  async create(
+    createCreationDtoOrArray: CreateCreationDto | CreateCreationDto[],
+  ) {
+    const createCreationDtos = Array.isArray(createCreationDtoOrArray)
+      ? createCreationDtoOrArray
+      : [createCreationDtoOrArray];
     const results = [];
 
     for (const createCreationDto of createCreationDtos) {
@@ -22,14 +26,18 @@ export class CreationService {
           creationName: createCreationDto.creationName,
         },
       });
-  
+
       if (creationFound) {
         throw new HttpException(
           'Creation name already exists',
           HttpStatus.CONFLICT,
         );
       }
-  
+
+      if (createCreationDto.encrypted) {
+        createCreationDto.keyCode = btoa(createCreationDto.keyCode);
+      }
+
       const newCreation = this.creationRepository.create(createCreationDto);
       results.push(await this.creationRepository.save(newCreation));
     }
@@ -41,7 +49,9 @@ export class CreationService {
   }
 
   async getCreationsByUsername(username: string): Promise<Creation[]> {
-    const creationFound = this.creationRepository.find({ where: { scientist: { username } } })
+    const creationFound = this.creationRepository.find({
+      where: { scientist: { username } },
+    });
 
     if (!creationFound) {
       throw new HttpException('Creation not found', HttpStatus.NOT_FOUND);
@@ -49,7 +59,10 @@ export class CreationService {
     return creationFound;
   }
 
-  async getCreationByUsernameAndId(username: string, creationId: number): Promise<Creation> {
+  async getCreationByUsernameAndId(
+    username: string,
+    creationId: number,
+  ): Promise<Creation> {
     const creation = await this.creationRepository.findOne({
       where: {
         scientist: { username },
@@ -64,7 +77,6 @@ export class CreationService {
     return creation;
   }
 
-
   async findOne(creationId: number) {
     const creationFound = await this.creationRepository.findOne({
       where: {
@@ -78,16 +90,22 @@ export class CreationService {
   async update(creationId: number, updateCreationDto: UpdateCreationDto) {
     const creationFound = await this.creationRepository.findOne({
       where: {
-        creationId
-      }
+        creationId,
+      },
     });
 
     if (!creationFound) {
-      return new HttpException('Creation not found', HttpStatus.NOT_FOUND)
-  }
+      return new HttpException('Creation not found', HttpStatus.NOT_FOUND);
+    }
 
-  const updateCreation = Object.assign(creationFound, updateCreationDto);
-  return this.creationRepository.save(updateCreation);
+    if(updateCreationDto.encrypted) {
+      updateCreationDto.keyCode = btoa(updateCreationDto.keyCode)
+    } else {
+      updateCreationDto.keyCode = atob(creationFound.keyCode)
+    }
+
+    const updateCreation = Object.assign(creationFound, updateCreationDto);
+    return this.creationRepository.save(updateCreation);
   }
 
   async deleteCreation(creationId: number) {

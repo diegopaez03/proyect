@@ -1,3 +1,4 @@
+import { MaxLength, MinLength } from 'class-validator';
 import { Scientist } from 'src/scientist/entities/scientist.entity';
 import {
   Column,
@@ -19,7 +20,9 @@ export class Creation {
   @Column()
   creationDescription: string;
 
-  @Column({ length: 10 }) //El largo del codigo clave sera de 10 digitos
+  @Column()
+  @MinLength(10)
+  @MaxLength(16) //El largo del codigo clave sera de 10 digitos
   keyCode: string;
 
   @Column()

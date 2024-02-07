@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsString,
-  Length,
+  MaxLength,
   MinLength,
   ValidateNested,
 } from 'class-validator';
@@ -17,7 +17,8 @@ export class CreateCreationDto {
   creationDescription: string;
 
   @IsString()
-  @Length(10)
+  @MinLength(10)
+  @MaxLength(16)
   keyCode: string;
 
   @IsBoolean()

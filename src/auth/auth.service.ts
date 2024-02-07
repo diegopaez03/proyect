@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   async registerBatch(registerDtoArray: RegisterDto[]) {        //esto esta creado solo con fines demostrativos
-    const results = [];
+    const results = [];                                         //es utilizado para cargar varios usuarios
     for (const registerDto of registerDtoArray) {
       const result = await this.register(registerDto);
       results.push(result);
@@ -23,8 +23,7 @@ export class AuthService {
   }
 
   async register({ username, password }: RegisterDto) {
-    const scientistFound =
-      await this.scientistService.findOneScientistByUsername(username);
+    const scientistFound = await this.scientistService.findOneScientistByUsername(username);
 
     if (scientistFound) {
       return new HttpException(
