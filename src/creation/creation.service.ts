@@ -99,9 +99,9 @@ export class CreationService {
     }
 
     if(updateCreationDto.encrypted) {
-      updateCreationDto.keyCode = btoa(updateCreationDto.keyCode)
+      creationFound.keyCode = btoa(creationFound.keyCode)
     } else {
-      updateCreationDto.keyCode = atob(creationFound.keyCode)
+      creationFound.keyCode = atob(creationFound.keyCode)
     }
 
     const updateCreation = Object.assign(creationFound, updateCreationDto);
