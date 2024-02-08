@@ -98,11 +98,12 @@ export class CreationService {
       return new HttpException('Creation not found', HttpStatus.NOT_FOUND);
     }
 
-    if(updateCreationDto.encrypted) {
-      creationFound.keyCode = btoa(creationFound.keyCode)
-    } else {
+    if(updateCreationDto.encrypted !== creationFound.encrypted) {
+      if(updateCreationDto.encrypted){
+        creationFound.keyCode = btoa(creationFound.keyCode)
+      } else {
       creationFound.keyCode = atob(creationFound.keyCode)
-    }
+    }}
 
     const updateCreation = Object.assign(creationFound, updateCreationDto);
     return this.creationRepository.save(updateCreation);
